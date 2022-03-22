@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shmonin.clientorder.dto.ClientDto;
 import com.shmonin.clientorder.exception.EntityNotFoundException;
 import com.shmonin.clientorder.exception.ExceptionData;
-import com.shmonin.clientorder.model.Client;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.shmonin.clientorder.exception.ExceptionMessage.CLIENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,7 +76,7 @@ class ClientControllerTest {
         clients.add(client3);
         var expected = objectMapper.writeValueAsString(clients);
 
-        this.mockMvc.perform(get("/client/all"))
+        this.mockMvc.perform(get("/clients"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expected));
@@ -97,7 +96,7 @@ class ClientControllerTest {
         client.setRoomNumber(1);
         var expected = objectMapper.writeValueAsString(client);
 
-        this.mockMvc.perform(get("/client/1"))
+        this.mockMvc.perform(get("/clients/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expected));
@@ -109,7 +108,7 @@ class ClientControllerTest {
                 new EntityNotFoundException(CLIENT.getMessage(10L)).getMessage()
         ));
 
-        this.mockMvc.perform(get("/client/10"))
+        this.mockMvc.perform(get("/clients/10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expected));
@@ -117,7 +116,7 @@ class ClientControllerTest {
 
     @Test
     void givenClientPutRequestWithJson_whenSave_thenReturnedTheSameJson() throws Exception {
-        var client = new Client();
+        var client = new ClientDto();
         client.setName("person4");
         client.setPhoneNumber(444444);
         client.setTaxpayerIdentificationNumber(123412345);
@@ -129,7 +128,7 @@ class ClientControllerTest {
         client.setRoomNumber(4);
         var expected = objectMapper.writeValueAsString(client);
 
-        this.mockMvc.perform(put("/client")
+        this.mockMvc.perform(post("/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(expected))
                 .andDo(print())

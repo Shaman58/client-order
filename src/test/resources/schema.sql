@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS clients;
 CREATE TABLE clients
 (
-    id              BIGINT PRIMARY KEY NOT NULL,
+    id              BIGSERIAL PRIMARY KEY NOT NULL,
     region_code     INTEGER,
     settlement      VARCHAR(50),
     street          VARCHAR(50),
@@ -15,10 +15,10 @@ CREATE TABLE clients
 );
 CREATE TABLE orders
 (
-    id BIGINT PRIMARY KEY NOT NULL,
-    date DATE,
-    details VARCHAR(100),
-    amount INTEGER,
+    id        BIGSERIAL PRIMARY KEY NOT NULL,
+    date      DATE,
+    details   VARCHAR(100),
+    amount    INTEGER,
     client_id BIGINT,
-FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    FOREIGN KEY (client_id) REFERENCES clients (id) ON DELETE CASCADE
 )

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -31,7 +31,7 @@ public class OrderController {
         return orderService.save(order, clientId);
     }
 
-    @GetMapping("/all/client/{clientId}")
+    @GetMapping("/client/{clientId}")
     public List<OrderDto> findAllByClientId(@PathVariable Long clientId) {
         return orderService.getAllByClientId(clientId);
     }
