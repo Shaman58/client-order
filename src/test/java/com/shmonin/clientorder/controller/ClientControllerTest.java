@@ -11,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.shmonin.clientorder.exception.ExceptionMessage.CLIENT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +34,8 @@ class ClientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private ObjectMapper objectMapper;
 
@@ -115,7 +121,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void givenClientPutRequestWithJson_whenSave_thenReturnedTheSameJson() throws Exception {
+    void givenClientsPutRequestWithJson_whenSave_thenReturnedTheSameJson() throws Exception {
         var client = new ClientDto();
         client.setName("person4");
         client.setPhoneNumber(444444);
@@ -134,5 +140,17 @@ class ClientControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expected));
+    }
+
+    @Test
+    void givenClientsIdDeleteRequest_whenDelete_thenDeleteRowInDb() throws Exception {
+        var expected = countRowsInTable(jdbcTemplate, "clients") - 1;
+
+        this.mockMvc.perform(delete("/clients/1"))
+                .andExpect(status().isOk());
+
+        var actual = countRowsInTable(jdbcTemplate, "clients");
+
+        assertEquals(expected, actual);
     }
 }
