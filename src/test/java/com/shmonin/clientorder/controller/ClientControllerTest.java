@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shmonin.clientorder.dto.ClientDto;
 import com.shmonin.clientorder.exception.EntityNotFoundException;
 import com.shmonin.clientorder.exception.ExceptionData;
+import com.shmonin.clientorder.model.Client;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,7 +122,7 @@ class ClientControllerTest {
     }
 
     @Test
-    void givenClientsPutRequestWithJson_whenSave_thenReturnedTheSameJson() throws Exception {
+    void givenClientsPostRequestWithJson_whenSave_thenReturnedTheSameJsonAndAddRowInDb() throws Exception {
         var client = new ClientDto();
         client.setName("person4");
         client.setPhoneNumber(444444);
@@ -132,14 +133,54 @@ class ClientControllerTest {
         client.setHouseNumber(4);
         client.setBuildingNumber(4);
         client.setRoomNumber(4);
-        var expected = objectMapper.writeValueAsString(client);
+        var personJson = objectMapper.writeValueAsString(client);
+        var expected = countRowsInTable(jdbcTemplate, "clients") + 1;
 
         this.mockMvc.perform(post("/clients")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(expected))
+                        .content(personJson))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json(expected));
+                .andExpect(content().json(personJson));
+
+        var actual = countRowsInTable(jdbcTemplate, "clients");
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void givenClientsPostRequestWithJson_whenSave_thenReturnedClientJson() throws Exception {
+        var client = new Client();
+        client.setId(1L);
+        client.setName("person4");
+        client.setPhoneNumber(444444);
+        client.setTaxpayerIdentificationNumber(123412345);
+        client.setSettlement("settlement4");
+        client.setRegionCode(4);
+        client.setStreet("street4");
+        client.setHouseNumber(4);
+        client.setBuildingNumber(4);
+        client.setRoomNumber(4);
+        var personJson = objectMapper.writeValueAsString(client);
+
+        var clientDto = new ClientDto();
+        clientDto.setName("person4");
+        clientDto.setPhoneNumber(444444);
+        clientDto.setTaxpayerIdentificationNumber(123412345);
+        clientDto.setSettlement("settlement4");
+        clientDto.setRegionCode(4);
+        clientDto.setStreet("street4");
+        clientDto.setHouseNumber(4);
+        clientDto.setBuildingNumber(4);
+        clientDto.setRoomNumber(4);
+        var personDtoJson = objectMapper.writeValueAsString(clientDto);
+
+        this.mockMvc.perform(post("/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(personJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(personDtoJson));
     }
 
     @Test
