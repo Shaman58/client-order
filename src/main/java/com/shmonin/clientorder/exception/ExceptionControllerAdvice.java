@@ -11,7 +11,7 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ExceptionData> handleException(EntityNotFoundException e) {
         var data = new ExceptionData(e.getMessage());
-        return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
     @ExceptionHandler
